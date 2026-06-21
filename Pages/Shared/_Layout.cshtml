@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - DMS System</title>
+
+    <link rel="stylesheet" href="~/lib/tabler/css/tabler.min.css">
+    
+    <style>
+        /* Impedisce il flash visivo degli elementi AlpineJS prima del caricamento */
+        [x-cloak] { display: none !important; }
+    </style>
+</head>
+<body class="layout-fluid">
+    <div class="page">
+        <header class="navbar navbar-expand-md navbar-light d-print-none">
+            <div class="container-xl">
+                <h1 class="navbar-brand navbar-brand-autodark pe-0 pe-md-3">
+                    <a href="/">
+                        <span class="text-primary font-weight-bold">DMS</span> Lightweight
+                    </a>
+                </h1>
+                
+                <div class="navbar-nav flex-row order-md-last">
+                    @if (User.Identity?.IsAuthenticated == true)
+                    {
+                        <div class="nav-item dropdown me-3 d-none d-md-flex">
+                            <span class="nav-link">
+                                Benvenuto, <strong class="ms-1">@User.Identity.Name</strong>
+                            </span>
+                        </div>
+                        <div class="nav-item">
+                            <form method="post" asp-page="/Auth/Logout" class="m-0">
+                                <button type="submit" class="btn btn-sm btn-outline-danger">
+                                    Disconnetti
+                                </button>
+                            </form>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="nav-item">
+                            <a href="/Auth/Login" class="btn btn-sm btn-primary">Accedi</a>
+                        </div>
+                    }
+                </div>
+            </div>
+        </header>
+
+        <div class="page-wrapper">
+            <main class="page-body">
+                <div class="container-xl">
+                    @RenderBody()
+                </div>
+            </main>
+
+            <footer class="footer footer-transparent d-print-none">
+                <div class="container-xl">
+                    <div class="row text-center align-items-center flex-row-reverse">
+                        <div class="col-12 col-lg-auto mt-3 mt-lg-0">
+                            <ul class="list-inline list-inline-dots mb-0">
+                                <li class="list-inline-item">
+                                    Copyright &copy; @DateTime.Now.Year DMS. Progetto Self-Hosted.
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <script src="~/lib/tabler/js/tabler.min.js" defer></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
