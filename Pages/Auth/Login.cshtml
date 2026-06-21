@@ -1,0 +1,49 @@
+@page
+@model DocumentManagementSystem.Pages.Auth.LoginModel
+@{
+    ViewData["Title"] = "Accedi al DMS";
+}
+
+<div style="max-width: 400px; margin: 60px auto; padding: 20px; border: 1px solid #ccc; border-radius: 8px;">
+    <h2 style="margin-bottom: 20px; text-center">Accedi al DMS</h2>
+
+    <form method="post">
+        <div asp-validation-summary="ModelOnly" style="color: red; margin-bottom: 15px;"></div>
+
+        <div style="margin-bottom: 15px;">
+            <label asp-for="Input.Email" style="display: block; margin-bottom: 5px;">Indirizzo Email</label>
+            <input asp-for="Input.Email" style="width: 100%; padding: 8px; box-sizing: border-box;" autocomplete="username" />
+            <span asp-validation-for="Input.Email" style="color: red; font-size: 14px;"></span>
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <label asp-for="Input.Password" style="display: block; margin-bottom: 5px;">Password</label>
+            <input asp-for="Input.Password" style="width: 100%; padding: 8px; box-sizing: border-box;" autocomplete="current-password" />
+            <span asp-validation-for="Input.Password" style="color: red; font-size: 14px;"></span>
+        </div>
+
+        <div style="margin-bottom: 20px;">
+            <label asp-for="Input.RememberMe">
+                <input asp-for="Input.RememberMe" />
+                @Html.DisplayNameFor(m => m.Input.RememberMe)
+            </label>
+        </div>
+
+        <div>
+            <button type="submit" style="width: 100%; padding: 10px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                Accedi
+            </button>
+        </div>
+    </form>
+
+    @if (Model.IsRegistrationEnabled)
+    {
+        <div style="margin-top: 15px; text-align: center;">
+            <a href="/Auth/Register" style="font-size: 14px; color: #555;">Non hai un account? Registrati</a>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

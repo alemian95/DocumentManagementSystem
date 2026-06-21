@@ -1,0 +1,14 @@
+@page
+@model DocumentManagementSystem.Pages.App.DashboardModel
+@{
+    ViewData["Title"] = "Dashboard DMS";
+}
+<div class="card">
+    <div class="card-body">
+        <h2>La tua Dashboard Privata</h2>
+        <p>Se vedi questa pagina, significa che sei autenticato come: <strong>@User.Identity?.Name</strong></p>
+        <form method="post" asp-page="/Auth/Logout">
+            <button class="btn btn-danger">Disconnetti</button>
+        </form>
+    </div>
+</div>

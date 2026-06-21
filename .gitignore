@@ -1,0 +1,42 @@
+## ---------- .NET / C# ----------
+# Cartelle di compilazione e output
+bin/
+obj/
+publish/
+
+# Pacchetti NuGet scaricati automaticamente
+packages/
+*.nuget.props
+*.nuget.targets
+
+## ---------- DATABASES (SQLite) ----------
+# Esclude i file del database locale e i file temporanei di SQLite
+*.db
+*.db-wal
+*.db-shm
+*.sqlite
+*.sqlite3
+
+## ---------- IDE / ARTIFATTI UTENTE ----------
+# Visual Studio
+.vs/
+*.user
+*.userosscache
+*.suo
+*.sln.docstates
+
+# VS Code
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.history/
+
+# Rider / JetBrains
+.idea/
+*.sln.iml
+
+## ---------- SISTEMA OPERATIVO ----------
+.DS_Store
+Thumbs.db

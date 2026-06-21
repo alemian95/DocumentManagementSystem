@@ -1,0 +1,63 @@
+@page
+@model DocumentManagementSystem.Pages.Auth.RegisterModel
+@{
+    ViewData["Title"] = "Registrati al DMS";
+}
+
+<div style="max-width: 400px; margin: 60px auto; padding: 20px; border: 1px solid #ccc; border-radius: 8px;">
+    
+    @if (!Model.IsRegistrationEnabled)
+    {
+        <div style="text-align: center; padding: 20px;">
+            <h2 style="color: #dc3545; margin-bottom: 15px;">Registrazione Chiusa</h2>
+            <p style="color: #6c757d; line-height: 1.5;">
+                La creazione di nuovi account è stata disabilitata su questo server. 
+                Se ritieni sia un errore, contatta l'amministratore del sistema.
+            </p>
+            <div style="margin-top: 25px;">
+                <a href="/Auth/Login" style="padding: 10px 20px; background-color: #007bff; color: white; text-decoration: none; border-radius: 4px;">Torna al Login</a>
+            </div>
+        </div>
+    }
+    else
+    {
+        <h2 style="margin-bottom: 20px; text-align: center;">Crea un Account DMS</h2>
+
+        <form method="post">
+
+            <div asp-validation-summary="ModelOnly" style="color: red; margin-bottom: 15px;"></div>
+
+            <div style="margin-bottom: 15px;">
+                <label asp-for="Input.Email" style="display: block; margin-bottom: 5px;">Indirizzo Email</label>
+                <input type="email" asp-for="Input.Email" style="width: 100%; padding: 8px; box-sizing: border-box;" autocomplete="email" />
+                <span asp-validation-for="Input.Email" style="color: red; font-size: 14px;"></span>
+            </div>
+
+            <div style="margin-bottom: 15px;">
+                <label asp-for="Input.Password" style="display: block; margin-bottom: 5px;">Password (Min. 6 caratteri)</label>
+                <input type="password" asp-for="Input.Password" style="width: 100%; padding: 8px; box-sizing: border-box;" autocomplete="new-password" />
+                <span asp-validation-for="Input.Password" style="color: red; font-size: 14px;"></span>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <label asp-for="Input.ConfirmPassword" style="display: block; margin-bottom: 5px;">Conferma Password</label>
+                <input type="password" asp-for="Input.ConfirmPassword" style="width: 100%; padding: 8px; box-sizing: border-box;" autocomplete="new-password" />
+                <span asp-validation-for="Input.ConfirmPassword" style="color: red; font-size: 14px;"></span>
+            </div>
+
+            <div>
+                <button type="submit" style="width: 100%; padding: 10px; background-color: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                    Registrati
+                </button>
+            </div>
+        </form>
+
+        <div style="margin-top: 15px; text-align: center;">
+            <a href="/Auth/Login" style="font-size: 14px; color: #555;">Hai già un account? Accedi</a>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
