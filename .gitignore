@@ -40,3 +40,6 @@ packages/
 ## ---------- SISTEMA OPERATIVO ----------
 .DS_Store
 Thumbs.db
+
+## Application
+Storage

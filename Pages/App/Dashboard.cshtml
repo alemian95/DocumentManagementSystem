@@ -1,14 +1,175 @@
 @page
 @model DocumentManagementSystem.Pages.App.DashboardModel
 @{
-    ViewData["Title"] = "Dashboard DMS";
+    ViewData["Title"] = "Dashboard - I miei File";
 }
-<div class="card">
-    <div class="card-body">
-        <h2>La tua Dashboard Privata</h2>
-        <p>Se vedi questa pagina, significa che sei autenticato come: <strong>@User.Identity?.Name</strong></p>
-        <form method="post" asp-page="/Auth/Logout">
-            <button class="btn btn-danger">Disconnetti</button>
-        </form>
+
+<div class="page-header d-print-none mb-4">
+    <div class="container-xl">
+        <div class="row g-2 align-items-center">
+            <div class="col">
+                <h2 class="page-title">
+                    Esploratore Risorse
+                </h2>
+                <div class="text-muted mt-1">Archivio principale (Root)</div>
+            </div>
+            <div class="col-auto ms-auto d-print-none">
+                <div class="btn-list">
+                    <button class="btn btn-outline-primary d-none d-sm-inline-block">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-folder-plus" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24h0z" fill="none"/><path d="M5 4h4l3 3h7a2 2 0 0 1 2 2v8a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-11a2 2 0 0 1 2 -2" /><path d="M12 10v6" /><path d="M9 13h6" /></svg>
+                        Nuova Cartella
+                    </button>
+                    <button class="btn btn-primary d-none d-sm-inline-block" onclick="triggerUpload()">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-upload" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24h0z" fill="none"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2" /><path d="M7 9l5 -5l5 5" /><path d="M12 4l0 12" /></svg>
+                        Carica File
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+
+<form method="post" asp-page-handler="CreateFolder" asp-route-currentFolderId="@Request.Query["folderId"]" class="row g-2 mb-3">
+    <div class="col-auto">
+        <input type="text" asp-for="NewFolderName" class="form-control" placeholder="Nome nuova cartella...">
+    </div>
+    <div class="col-auto">
+        <button type="submit" class="btn btn-outline-primary">Crea Cartella</button>
+    </div>
+</form>
+
+<div class="card">
+    <div class="table-responsive">
+        <table class="table card-table table-vcenter text-nowrap datatable">
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Tipo</th>
+                    <th>Dimensione</th>
+                    <th class="w-1"></th> </tr>
+            </thead>
+            <tbody>
+                @foreach (var nodo in Model.FileSystemNodes)
+                {
+                    <tr>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                @if (nodo.IsDirectory)
+                                {
+                                    <span class="avatar avatar-xs bg-yellow-lt text-yellow me-2">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-folder" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24h0z" fill="none"/><path d="M5 4h4l3 3h7a2 2 0 0 1 2 2v8a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-11a2 2 0 0 1 2 -2" /></svg>
+                                    </span>
+                                    <a href="/App/Dashboard?folderId=@nodo.Id" class="text-reset">
+                                        <strong>@nodo.Name</strong>
+                                    </a>
+                                }
+                                else
+                                {
+                                    <span class="avatar avatar-xs bg-blue-lt text-blue me-2">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-file" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24h0z" fill="none"/><path d="M14 3v4a1 1 0 0 0 1 1h4" /><path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z" /></svg>
+                                    </span>
+                                    <span class="text-reset">@nodo.Name</span>
+                                }
+                            </div>
+                        </td>
+                        <td class="text-muted">
+                            @(nodo.IsDirectory ? "Cartella di sistema" : (nodo.FileMetadata?.MimeType ?? "File sconosciuto"))
+                        </td>
+                        <td class="text-muted">
+                            @if (nodo.IsDirectory)
+                            {
+                                <span>-</span>
+                            }
+                            else if (nodo.FileMetadata != null)
+                            {
+                                <span>@((nodo.FileMetadata.SizeBytes / 1024.0).ToString("F1")) KB</span>
+                            }
+                            else
+                            {
+                                <span>0 KB</span>
+                            }
+                        </td>
+                        <td>
+                            <div class="btn-group">
+                                @if (!nodo.IsDirectory)
+                                {
+                                    <a href="/api/files/download/@nodo.Id" class="btn btn-icon btn-sm btn-ghost-secondary" title="Scarica">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-download" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24h0z" fill="none"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2" /><path d="M7 9l5 -5l5 5" /><path d="M12 4l0 12" /></svg>
+                                    </a>
+                                }
+                            </div>
+                        </td>
+                    </tr>
+                }
+
+                @if (!Model.FileSystemNodes.Any())
+                {
+                    <tr>
+                        <td colspan="4" class="text-center py-5 text-muted">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-folder-off text-muted mb-2" width="40" height="40" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24h0z" fill="none"/><path d="M3 3l18 18" /><path d="M19 19H3V6c0-.17.021-.336.062-.497M7 3h2l3 3h7a2 2 0 0 1 2 2v7" /></svg>
+                            <p class="mb-0">Questa cartella è vuota.</p>
+                            <small>Usa i pulsanti in alto per iniziare a popolarla.</small>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function triggerUpload() {
+            // Creiamo al volo un input file nascosto per aprire la finestra di selezione del sistema operativo
+            const input = document.createElement('input');
+            input.type = 'file';
+            
+            input.onchange = async (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                // Recuperiamo l'ID della cartella corrente dall'URL (se siamo in una sottocartella)
+                const urlParams = new URLSearchParams(window.location.search);
+                const folderId = urlParams.get('folderId');
+
+                // Prepariamo i dati per il form multipart
+                const formData = new FormData();
+                formData.append('file', file);
+                if (folderId) {
+                    formData.append('parentId', folderId);
+                }
+
+                try {
+                    // Chiamata AJAX verso l'API
+                    const response = await fetch('/api/files/upload', {
+                        method: 'POST',
+                        body: formData
+                        // Non serve impostare gli Header per il Multipart, il browser lo fa da solo
+                    });
+
+                    if (response.ok) {
+                        // Ricarica la pagina per mostrare il nuovo file inserito nella tabella
+                        window.location.reload();
+                    } else {
+                        const errorText = await response.text();
+                        alert('Errore durante il caricamento: ' + errorText);
+                    }
+                } catch (error) {
+                    console.error('Errore:', error);
+                    alert('Si è verificato un errore di rete.');
+                }
+            };
+
+            input.click();
+        }
+    </script>
+}

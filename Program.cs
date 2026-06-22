@@ -1,4 +1,5 @@
 using DocumentManagementSystem.Data;
+using DocumentManagementSystem.Support;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -26,6 +27,11 @@ builder.Services.ConfigureApplicationCookie(options =>
 
 builder.Services.AddRazorPages();
 builder.Services.AddControllers();
+
+builder.Services.AddSingleton(new StorageSettings
+{ 
+    BasePath = Path.Combine(builder.Environment.ContentRootPath, "Storage") 
+});
 
 var app = builder.Build();
 
