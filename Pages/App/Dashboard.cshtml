@@ -47,6 +47,30 @@
     </div>
 </form>
 
+<ol class="breadcrumb mb-2" aria-label="breadcrumbs">
+    <li class="breadcrumb-item">
+        <a href="/App/Dashboard">Home</a>
+    </li>
+
+    @for (int i = 0; i < Model.Breadcrumbs.Count; i++)
+    {
+        var crumb = Model.Breadcrumbs[i];
+        
+        if (i == Model.Breadcrumbs.Count - 1)
+        {
+            <li class="breadcrumb-item active" aria-current="page">
+                @crumb.Name
+            </li>
+        }
+        else
+        {
+            <li class="breadcrumb-item">
+                <a href="/App/Dashboard?folderId=@crumb.Id">@crumb.Name</a>
+            </li>
+        }
+    }
+</ol>
+
 <div class="card">
     <div class="table-responsive">
         <table class="table card-table table-vcenter text-nowrap datatable">

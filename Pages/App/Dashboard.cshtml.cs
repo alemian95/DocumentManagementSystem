@@ -14,6 +14,11 @@ public class DashboardModel : PageModel
 
     public required List<Models.FileSystemNode> FileSystemNodes { get; set; } = new();
 
+    public List<Models.FileSystemNode> Breadcrumbs { get; set; } = new();
+
+    public Models.FileSystemNode? CurrentFolder { get; set; }
+
+
     [BindProperty]
     public string NewFolderName { get; set; } = string.Empty;
 
@@ -22,14 +27,53 @@ public class DashboardModel : PageModel
         _db = db;
     }
 
-    public async Task OnGet()
+    public async Task OnGet(Guid? folderId)
     {
-        FileSystemNodes = await _db.FileSystemNodes
-            .Where(n => n.ParentId == null)
-            .Include(n => n.FileMetadata)
-            .OrderByDescending(n => n.IsDirectory)
-            .ThenBy(n => n.Name)
-            .ToListAsync();
+
+        if (folderId.HasValue)
+        {
+            CurrentFolder = await _db.FileSystemNodes.FirstOrDefaultAsync(n => n.Id == folderId.Value && n.IsDirectory);
+            if (CurrentFolder != null)
+            {
+                FileSystemNodes = await _db.FileSystemNodes
+                    .Where(n => n.ParentId == CurrentFolder.Id)
+                    .Include(n => n.FileMetadata)
+                    .OrderByDescending(n => n.IsDirectory)
+                    .ThenBy(n => n.Name)
+                    .ToListAsync();
+            }
+        }
+
+        if (CurrentFolder == null)
+        {
+            FileSystemNodes = await _db.FileSystemNodes
+                .Where(n => n.ParentId == null)
+                .Include(n => n.FileMetadata)
+                .OrderByDescending(n => n.IsDirectory)
+                .ThenBy(n => n.Name)
+                .ToListAsync();
+        }
+
+        if (CurrentFolder != null)
+        {
+            var path = new List<Models.FileSystemNode>();
+            var tmp = CurrentFolder;
+
+            while (tmp != null)
+            {
+                path.Add(tmp);
+                if (tmp.ParentId.HasValue)
+                {
+                    tmp = await _db.FileSystemNodes.FirstOrDefaultAsync(n => n.Id == tmp.ParentId.Value);
+                }
+                else
+                {
+                    tmp = null;
+                }
+            }
+            path.Reverse();
+            Breadcrumbs = path;
+        }
     }
 
     public async Task<IActionResult> OnPostCreateFolderAsync(Guid? currentFolderId)
