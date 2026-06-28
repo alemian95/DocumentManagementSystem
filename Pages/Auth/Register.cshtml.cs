@@ -66,16 +66,19 @@ public class RegisterModel : PageModel
         }
 
         if (!ModelState.IsValid)
-    {
-        foreach (var modelStateKey in ModelState.Keys)
         {
-            var value = ModelState[modelStateKey];
-            foreach (var error in value.Errors)
+            foreach (var modelStateKey in ModelState.Keys)
             {
-                _logger.LogWarning($"Errore sul campo {modelStateKey}: {error.ErrorMessage}");
+                var value = ModelState[modelStateKey];
+                if (value != null)
+                {
+                    foreach (var error in value.Errors)
+                    {
+                        _logger.LogWarning($"Errore sul campo {modelStateKey}: {error.ErrorMessage}");
+                    }
+                }
             }
         }
-    }
 
         if (ModelState.IsValid)
         {
